@@ -72,3 +72,18 @@ services:
     - "kafka0"
     - "kafka1"
     - "kafka2"
+
+  rest-proxy:
+    image: confluentinc/cp-kafka-rest:6.2.2
+    ports:
+    - "8082:8082"
+    environment:
+      KAFKA_REST_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092,PLAINTEXT://kafka1:19093,PLAINTEXT://kafka2:19094"
+      KAFKA_REST_LISTENERS: "http://0.0.0.0:8082/"
+      KAFKA_REST_HOST_NAME: "rest-proxy"
+      KAFKA_REST_SCHEMA_REGISTRY_URL: "http://schema-registry:8081/"
+    depends_on:
+    - "kafka0"
+    - "kafka1"
+    - "kafka2"
+    - "schema-registry"
