@@ -1,0 +1,8 @@
+#
+# This docker-compose file starts and runs:
+# * A 3 node kafka cluster
+# * A 1 zookeeper ensemble
+# * Schema Registry
+# * Kafka Rest Proxy
+# * Kafka Connect
+#
