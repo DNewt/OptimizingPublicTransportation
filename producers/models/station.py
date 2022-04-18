@@ -25,13 +25,13 @@ class Station(Producer):
             .replace("'", "")
         )
 
-        topic_name = "com.udacity.cta.station.events"
+        topic_name = f"org.chicago.cta.station.arrivals.{station_name}"
         super().__init__(
             topic_name,
             key_schema=Station.key_schema,
             value_schema=Station.value_schema,
             num_partitions=3,
-            num_replicas=2
+            num_replicas=1
         )
 
         self.station_id = int(station_id)
@@ -44,12 +44,13 @@ class Station(Producer):
 
     def run(self, train, direction, prev_station_id, prev_direction):
         """Simulates train arrivals at this station"""
+        logger.info(f"Begin producing messages for {self.name}")
 
         self.producer.produce(
             topic = self.topic_name,
             key = {"timestamp": self.time_millis()},
             value = {
-                "station_id":  self.station_id,
+                "station_id": self.station_id,
                 "train_id": train.train_id,
                 "direction": direction,
                 "line": self.color.name,

@@ -2,6 +2,7 @@
 import collections
 from enum import IntEnum
 import logging
+import time
 
 from models import Station, Train
 
@@ -41,7 +42,9 @@ class Line:
             Station(station_data["station_id"].unique()[0], stations[0], self.color)
         ]
         prev_station = line[0]
+        
         for station in stations[1:]:
+            logger.info("Creating a new station")
             station_data = station_df[station_df["station_name"] == station]
             new_station = Station(
                 station_data["station_id"].unique()[0],
@@ -51,7 +54,9 @@ class Line:
             )
             prev_station.dir_b = new_station
             prev_station = new_station
+            logger.info("Appending station")
             line.append(new_station)
+        logger.info("Completed making Stations")
         return line
 
     ######################################################################
@@ -61,6 +66,7 @@ class Line:
     ######################################################################
     def _build_trains(self):
         """ Constructs and assigns train objects to stations """
+        logger.info("Started making Trains")
         trains = []
         curr_loc = 0
         b_dir = True
@@ -77,6 +83,7 @@ class Line:
                 self.stations[curr_loc].arrive_a(train, None, None)
             curr_loc, b_dir = self._get_next_idx(curr_loc, b_dir)
 
+        logger.info("Completed making Trains")
         return trains
    
     def run(self, timestamp, time_step):

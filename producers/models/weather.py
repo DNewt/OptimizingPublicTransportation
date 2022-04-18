@@ -28,11 +28,11 @@ class Weather(Producer):
     def __init__(self, month):
 
         super().__init__(
-            "com.udacity.cta.weather", 
+            "org.chicago.cta.weather.v1", 
             key_schema=Weather.key_schema,
             value_schema=Weather.value_schema,
             num_partitions=3,
-            num_replicas=2
+            num_replicas=1
         )
 
         self.status = Weather.status.sunny
@@ -64,7 +64,7 @@ class Weather(Producer):
         self._set_weather(month)
 
         resp = requests.post(
-            f"{Weather.rest_proxy_url}/topics/com.udacity.cta.weather",
+            f"{Weather.rest_proxy_url}/topics/org.chicago.cta.weather.v1",
             headers={"Content-Type": "application/vnd.kafka.avro.v2+json"},
             data=json.dumps(
                 {

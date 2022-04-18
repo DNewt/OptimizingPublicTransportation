@@ -32,7 +32,7 @@ class Turnstile(Producer):
             key_schema=Turnstile.key_schema,
             value_schema=Turnstile.value_schema,
             num_partitions=3,
-            num_replicas=2,
+            num_replicas=1,
         )
         self.station = station
         self.turnstile_hardware = TurnstileHardware(station)
@@ -42,7 +42,6 @@ class Turnstile(Producer):
 
         num_entries = self.turnstile_hardware.get_entries(timestamp, time_step)
         for _ in range(num_entries):
-            time.sleep(0.5)
             logger.info(
                 "Rider %s out of %s entering %s",
                 _,

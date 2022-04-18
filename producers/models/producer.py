@@ -8,13 +8,15 @@ import time
 
 from confluent_kafka import avro
 from confluent_kafka.admin import AdminClient, NewTopic
-from confluent_kafka.avro import AvroProducer
+from confluent_kafka.avro import AvroProducer, CachedSchemaRegistryClient
 
 logger = logging.getLogger(__name__)
 
+SCHEMA_REGISTRY_URL = "http://localhost:8081"
+
 class Producer:
     """ Defines and provides common functionality amongst Producers """
-
+    
     # Tracks existing topics across all Producer instances
     existing_topics = set([])
 
@@ -35,8 +37,7 @@ class Producer:
         self.num_replicas = num_replicas
 
         self.broker_properties = {
-            "bootstrap.servers": "127.0.0.1:9092",
-            "schema.registry.url": "http://localhost:8081"
+            "bootstrap.servers": "127.0.0.1:9092"
         }
 
         # If the topic does not already exist, try to create it
@@ -44,10 +45,12 @@ class Producer:
             self.create_topic()
             Producer.existing_topics.add(self.topic_name)
 
+        logger.info(f"Creating a new producer for {self.topic_name}")
         self.producer = AvroProducer(
             self.broker_properties,
-            default_key_schema=self.key_schema,
-            default_value_schema=self.value_schema
+            schema_registry = CachedSchemaRegistryClient(SCHEMA_REGISTRY_URL),
+            default_key_schema = self.key_schema,
+            default_value_schema = self.value_schema
         )
 
     def create_topic(self):
@@ -58,7 +61,6 @@ class Producer:
 
         client = AdminClient({"bootstrap.servers": "127.0.0.1:9092"})
         client.create_topics(new_topic)
-        logging.debug("Topic created")
 
     def close(self):
         """ Prepares the producer for exit by cleaning up the producer """
