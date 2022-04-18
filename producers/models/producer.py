@@ -35,7 +35,8 @@ class Producer:
         self.num_replicas = num_replicas
 
         self.broker_properties = {
-            # Add properties here
+            "bootstrap.servers": "127.0.0.1:9092",
+            "schema.registry.url": "http://localhost:8081"
         }
 
         # If the topic does not already exist, try to create it
@@ -44,16 +45,24 @@ class Producer:
             Producer.existing_topics.add(self.topic_name)
 
         self.producer = AvroProducer(
-            # Add properties here
+            self.broker_properties,
+            default_key_schema=self.key_schema,
+            default_value_schema=self.value_schema
         )
 
     def create_topic(self):
         """ Creates the producer topic if it does not already exist """
-        # Add code here
+        logger.info(f"Creating Topic {self.topic_name}")
+        new_topic = []
+        new_topic.append(NewTopic(topic=self.topic_name, num_partitions=self.num_replicas, replication_factor=self.num_replicas))
+
+        client = AdminClient({"bootstrap.servers": "127.0.0.1:9092"})
+        client.create_topics(new_topic)
+        logging.debug("Topic created")
 
     def close(self):
         """ Prepares the producer for exit by cleaning up the producer """
-        # Add code here
+        self.producer.flush()
 
     def time_millis(self):
         """ Use this function to get the key for Kafka Events """

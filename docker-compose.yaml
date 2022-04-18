@@ -64,7 +64,7 @@ services:
     ports:
     - "8081:8081"
     environment:
-      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092,PLAINTEXT://kafka1:19093,PLAINTEXT://kafka2:19094"
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092"
       SCHEMA_REGISTRY_LISTENERS: "http://0.0.0.0:8081"
       SCHEMA_REGISTRY_HOST_NAME: "schema-registry"
       SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: "1"
@@ -78,7 +78,7 @@ services:
     ports:
     - "8082:8082"
     environment:
-      KAFKA_REST_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092,PLAINTEXT://kafka1:19093,PLAINTEXT://kafka2:19094"
+      KAFKA_REST_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092"
       KAFKA_REST_LISTENERS: "http://0.0.0.0:8082/"
       KAFKA_REST_HOST_NAME: "rest-proxy"
       KAFKA_REST_SCHEMA_REGISTRY_URL: "http://schema-registry:8081/"
@@ -93,10 +93,10 @@ services:
     ports:
     - "8083:8083"
     environment:
-      CONNECT_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092,PLAINTEXT://kafka1:19093,PLAINTEXT://kafka2:19094"
+      CONNECT_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092"
       CONNECT_GROUP_ID: "connect"
       CONNECT_REST_ADVERTISED_HOST_NAME: "connect"
-      CONNECT_PLUGIN_PATH: "/usr/share/java"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components"
       CONNECT_INTERNAL_KEY_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_INTERNAL_VALUE_CONVERTER: "org.apache.kafka.connect.json.JsonConverter"
       CONNECT_KEY_CONVERTER: "io.confluent.connect.avro.AvroConverter"
@@ -109,6 +109,13 @@ services:
       CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: "1"
       CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: "1"
+    command:
+      - /bin/bash
+      - -c 
+      - |
+        confluent-hub install --no-prompt confluentinc/kafka-connect-jdbc:latest
+        sleep infinity &
+        /etc/confluent/docker/run
     depends_on:
     - "kafka0"
     - "kafka1"
@@ -120,7 +127,7 @@ services:
     ports:
     - "8088:8088"
     environment:
-      KSQL_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092,PLAINTEXT://kafka1:19093,PLAINTEXT://kafka2:19094"
+      KSQL_BOOTSTRAP_SERVERS: "PLAINTEXT://kafka0:19092"
       KSQL_LISTENERS: "http://0.0.0.0:8088"
       KSQL_KSQL_SERVICE_ID: "ksql_service_docker"
       KSQL_KSQL_SCHEMA_REGISTRY_URL: "http://schema-registry:8081/"
