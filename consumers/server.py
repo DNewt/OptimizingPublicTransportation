@@ -2,6 +2,7 @@
 import logging
 import logging.config
 from pathlib import Path
+import time
 
 import tornado.ioloop
 import tornado.template
@@ -37,7 +38,6 @@ class MainHandler(tornado.web.RequestHandler):
         self.write(
             MainHandler.template.generate(weather=self.weather, lines=self.lines)
         )
-
 
 def run_server():
     """Runs the Tornado Server and begins Kafka consumption"""
@@ -83,7 +83,7 @@ def run_server():
             lines.process_message,
             offset_earliest=True,
             is_avro=False,
-        ),
+        )
     ]
 
     try:
@@ -91,6 +91,7 @@ def run_server():
             "Open a web browser to http://localhost:8888 to see the Transit Status Page"
         )
         for consumer in consumers:
+            time.sleep(2)
             tornado.ioloop.IOLoop.current().spawn_callback(consumer.consume)
 
         tornado.ioloop.IOLoop.current().start()
