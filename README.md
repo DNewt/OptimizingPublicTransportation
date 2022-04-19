@@ -11,6 +11,11 @@ This is a project for the Udacity Nanodegree Data Streaming.
 
 Start Kafka and all its components up
 
+If needed - tidy up previous
+```
+docker-compose down --remove-orphans
+```
+
 ```
 docker-compose up
 ```
@@ -46,7 +51,7 @@ pip install -r requirements.txt
 ```
 
 ```
-faust -A faust_stream worker -l info
+python3 faust_stream.py worker -l info
 ```
 
 Run the KSQL script to create a summary of the turnstile data

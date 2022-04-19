@@ -2,4 +2,3 @@ confluent-kafka
 requests
 avro
 pandas
-time
